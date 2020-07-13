@@ -10,6 +10,9 @@ import SwiftUI
 struct ContentView: View {
     
     @State var selection: Set<Int> = [0]
+    
+    @State var showMembers = true
+    
     // Label("INFORMATION", systemImage: "info")
     var body: some View {
         NavigationView {
@@ -162,12 +165,14 @@ struct ContentView: View {
                 }
             }
             
-            MainView()
+            MainView(showMembers: $showMembers)
         }
     }
 }
 
 struct MainView: View {
+    @Binding var showMembers: Bool
+    
     var body: some View {
         HStack {
 //            VStack {
@@ -223,7 +228,7 @@ struct MainView: View {
 //                    }.padding(.leading, 8)
 //                    Spacer()
 //                }.frame(maxWidth: .infinity, minHeight: 40, idealHeight: 50, maxHeight: 60)
-                Channel()
+                Channel(showMembers: $showMembers)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .navigationTitle("#general")
                         .navigationSubtitle("A place for conversations, questions, and concerns!")
@@ -236,7 +241,9 @@ struct MainView: View {
                                 Button(action: {}) {
                                     Image(systemName: "pin.fill")
                                 }
-                                Button(action: {}) {
+                                Button(action: {
+                                    showMembers.toggle()
+                                }) {
                                         Image(systemName: "person.2.fill")
                                     }
                                 Button(action: {}) {
@@ -269,6 +276,32 @@ struct Channel: View {
         "are the ones who do."
     ]
     
+    @Binding var showMembers: Bool
+    
+    var body: some View {
+        HStack {
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(messages, id: \.self) { message in
+                            Message(text: message)
+                        }
+                    }
+                    .padding()
+                }
+                
+                MessageBar()
+            }
+            
+            if showMembers {
+                MemberList()
+            }
+            
+        }
+    }
+}
+
+struct MemberList: View {
     var colors = [
         Color.red,
         Color.orange,
@@ -279,75 +312,61 @@ struct Channel: View {
     ]
     
     var body: some View {
-        HStack {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(messages, id: \.self) { message in
-                        Message(text: message)
-                    }
+        List{
+            Text("ADMIN - 1")
+                .font(.caption)
+            HStack {
+                ZStack {
+                    //                            Circle()
+                    //                                .trim(from:0, to: 1)
+                    //                                .foregroundColor(.white)
+                    //                                .frame(width: 25, height: 25)
+                    Image("pfp")
+                        .resizable()
+                        .clipShape(Circle())
+                        .frame(width: 35, height: 35, alignment: .leading)
                 }
-                .padding()
+                VStack(alignment: .leading) {
+                    Text("code_pranav").font(.headline)
+                    Text("Playing Xcode").font(.callout).foregroundColor(.gray)
+                }
+                Spacer()
             }
-            
-            MessageBar()
-        }
-            List{
-                Text("ADMIN - 1")
-                    .font(.caption)
-                HStack {
-                    ZStack {
-//                            Circle()
-//                                .trim(from:0, to: 1)
-//                                .foregroundColor(.white)
-//                                .frame(width: 25, height: 25)
-                        Image("pfp")
-                            .resizable()
-                            .clipShape(Circle())
-                            .frame(width: 35, height: 35, alignment: .leading)
-                    }
-                    VStack(alignment: .leading) {
-                        Text("code_pranav").font(.headline)
-                        Text("Playing Xcode").font(.callout).foregroundColor(.gray)
-                    }
-                    Spacer()
+            Text("ONLINE - 2")
+                .font(.caption)
+            HStack {
+                ZStack {
+                    Circle()
+                        .trim(from:0, to: 1)
+                        .foregroundColor(colors.randomElement())
+                        .frame(width: 35, height: 35)
+                    Image("discordwhite")
+                        .resizable()
+                        .frame(width:25, height: 18)
                 }
-                Text("ONLINE - 2")
-                    .font(.caption)
-                HStack {
-                    ZStack {
-                        Circle()
-                            .trim(from:0, to: 1)
-                            .foregroundColor(colors.randomElement())
-                            .frame(width: 35, height: 35)
-                        Image("discordwhite")
-                            .resizable()
-                            .frame(width:25, height: 18)
-                    }
-                    VStack(alignment: .leading) {
-                        Text("astral lexus").font(.headline)
-                        Text("Playing Twitter").font(.callout).foregroundColor(.gray)
-                    }
-                    Spacer()
+                VStack(alignment: .leading) {
+                    Text("astral lexus").font(.headline)
+                    Text("Playing Twitter").font(.callout).foregroundColor(.gray)
                 }
-                HStack {
-                    ZStack {
-                        Circle()
-                            .trim(from:0, to: 1)
-                            .foregroundColor(colors.randomElement())
-                            .frame(width: 35, height: 35)
-                        Image("discordwhite")
-                            .resizable()
-                            .frame(width:25, height: 18)
-                    }
-                    VStack(alignment: .leading) {
-                        Text("username").font(.headline)
-                        Text("Playing Twitter").font(.callout).foregroundColor(.gray)
-                    }
-                    Spacer()
+                Spacer()
+            }
+            HStack {
+                ZStack {
+                    Circle()
+                        .trim(from:0, to: 1)
+                        .foregroundColor(colors.randomElement())
+                        .frame(width: 35, height: 35)
+                    Image("discordwhite")
+                        .resizable()
+                        .frame(width:25, height: 18)
                 }
-            }.frame(minWidth: 100, idealWidth: 150, maxWidth: 200, maxHeight: .infinity).background(Color.init(.sRGB, red: 235/255, green: 237/255, blue: 239/255, opacity: 1.0))
-        }
+                VStack(alignment: .leading) {
+                    Text("username").font(.headline)
+                    Text("Playing Twitter").font(.callout).foregroundColor(.gray)
+                }
+                Spacer()
+            }
+        }.frame(minWidth: 100, idealWidth: 150, maxWidth: 200, maxHeight: .infinity).background(Color.init(.sRGB, red: 235/255, green: 237/255, blue: 239/255, opacity: 1.0))
     }
 }
 
